@@ -9,7 +9,14 @@ build:
  script:
    - cask build
 
-test:
+warnings:
+ stage: test
+ script:
+   - cask build 2>&1 | tee /tmp/build
+   - "# If :Warning: was displayed above, this test fails"
+   - "[ $(grep ':Warning:' /tmp/build | wc -l) -gt 0 ] && return 1 || return 0"
+
+ert-runner:
  stage: test
  script:
    - cask exec ert-runner
