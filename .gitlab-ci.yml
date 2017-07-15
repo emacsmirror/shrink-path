@@ -1,0 +1,15 @@
+before_script:
+  - apk add --update bash git ruby ruby-json python curl emacs 1>/dev/null
+  - export PATH=~/.cask/bin:$PATH
+  - curl -fsSkL https://raw.github.com/cask/cask/master/go | python &>/dev/null
+  - cask
+
+build:
+ stage: build
+ script:
+   - cask build
+
+test:
+ stage: test
+ script:
+   - cask exec ert-runner
