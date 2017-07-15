@@ -35,12 +35,12 @@
   (should (equal (shrink-path "/") "/")))
 
 (ert-deftest shrink-path/home-tilde ()
-  (should (with-home "/home/test"
-                     (equal (shrink-path "~") "~/"))))
+  (with-home "/home/test"
+             (should (equal (shrink-path "~") "~/"))))
 
 (ert-deftest shrink-path/home-absolute ()
-  (should
-   (with-home "/home/test"
+  (with-home "/home/test"
+             (should
               (equal (shrink-path "/home/test")
                      "~/"))))
 
@@ -56,49 +56,47 @@
            "/e/X/xorg.conf.d/")))
 
 (ert-deftest shrink-path/home-tilde-depth=1 ()
-  (should
-   (with-home "/home/test"
-              (equal
-               (shrink-path "~/Projects/")
-              "~/Projects/"))))
+  (with-home "/home/test"
+             (should (equal
+                      (shrink-path "~/Projects/")
+                      "~/Projects/"))))
 
 (ert-deftest shrink-path/home-tilde-depth=1-hidden ()
-  (should (with-home "/home/test"
-                     (equal
+  (with-home "/home/test"
+             (should (equal
                       (shrink-path "~/.config/")
                       "~/.config/"))))
 
 (ert-deftest shrink-path/home-tilde-depth>1-last-hidden ()
-  (should (with-home "/home/test"
-                     (equal
+  (with-home "/home/test"
+             (should (equal
                       (shrink-path "~/Projects/dotfiles/emacs/.emacs.d")
                       "~/P/d/e/.emacs.d/"))))
 
 (ert-deftest shrink-path/home-tilde-depth>1-last-regular ()
-  (should (with-home "/home/test"
-                     (equal
+  (with-home "/home/test"
+             (should (equal
                       (shrink-path "~/Projects/dotfiles/emacs/.emacs.d/modules")
                       "~/P/d/e/.e/modules/"))))
 
 (ert-deftest shrink-path/home-absolute-depth>1-last-hidden ()
-  (should (with-home "/home/test"
-                     (equal
-                      (shrink-path "/home/test/Projects/dotfiles/emacs/.emacs.d")
-                      "~/P/d/e/.emacs.d/"))))
-
+  (with-home "/home/test"
+             (should
+              (equal
+               (shrink-path "/home/test/Projects/dotfiles/emacs/.emacs.d")
+               "~/P/d/e/.emacs.d/"))))
 
 (ert-deftest shrink-path/home-absolute-depth>1-last-regular ()
-  (should (with-home "/home/test"
-                     (equal
+  (with-home "/home/test"
+             (should (equal
                       (shrink-path "/home/test/Projects/dotfiles/emacs/.emacs.d/modules")
                       "~/P/d/e/.e/modules/"))))
 
 (ert-deftest shrink-path/home-tilde-depth>1-middle-hidden ()
-  (should (with-home "/home/test"
-                     (equal
+  (with-home "/home/test"
+             (should (equal
                       (shrink-path  "~/Projects/.dotfiles/zsh")
                       "~/P/.d/zsh/"))))
-
 
 (provide 'shrink-path-test)
 ;;; shrink-path-test.el ends here
