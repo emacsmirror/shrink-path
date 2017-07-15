@@ -12,9 +12,11 @@
   "Within HOME environment evaluate BODY."
   `(let ((abbreviated-home-dir nil) ; needed for interactive emacs
          (before (getenv "HOME")))
-    (setenv "HOME" ,home)
-    (let ((result ,@body))
-      (setenv "HOME" before)
-      result)))
+     (unwind-protect
+         (progn
+           (setenv "HOME" ,home)
+           ,@body)
+       (setenv "HOME" before))))
+
 
 (load (expand-file-name "shrink-path" shrink-path-test/root-path) 'noerror 'nomessage)
