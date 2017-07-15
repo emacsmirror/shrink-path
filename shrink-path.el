@@ -39,20 +39,21 @@
          (path (f-full path))
          (split (f-split path)))
     (cond
+     ((s-equals? (f-short path) "/") "/")
+     ((s-equals? (f-short path) "~") "~/")
+
      ((f-descendant-of? path "~")
       (let ((shrunked (-map (lambda (segment)
-                                (s-left (if (s-starts-with? "." segment) 2 1)
-                                        segment))
-                              (-> split (-slice 3 -1)))))
-          (s-concat "~/" (s-join "/" shrunked) "/" (s-join "" (last split)) "/")))
-     ((s-equals? (f-short path) "/") "/")
-     ((s-equals? (f-short path) "~/") "~/")
+                              (s-left (if (s-starts-with? "." segment) 2 1)
+                                      segment))
+                            (-> split (-slice 3 -1)))))
+        (s-concat "~/" (s-join "/" shrunked) "/" (s-join "" (last split)) "/")))
      (t
       (let ((shrunked (-map (lambda (segment)
-                                (s-left (if (s-starts-with? "." segment) 2 1)
-                                        segment))
-                              (-> split (-slice 1 -1)))))
-          (s-concat "/" (s-join "/" shrunked) "/" (s-join "" (last split)) "/"))))))
+                              (s-left (if (s-starts-with? "." segment) 2 1)
+                                      segment))
+                            (-> split (-slice 1 -1)))))
+        (s-concat "/" (s-join "/" shrunked) "/" (s-join "" (last split)) "/"))))))
 
 
 (provide 'shrink-path)
