@@ -38,7 +38,7 @@
   (should (equal (shrink-path "~") "~/")))
 
 (ert-deftest shrink-path/home-absolute ()
-  (should (equal (shrink-path "/home/benny/") "~/")))
+  (should (equal (shrink-path (f-canonical "~/")) "~/")))
 
 (ert-deftest shrink-path/root-depth=1 ()
   (should (equal (shrink-path "/tmp") "/tmp/")))
@@ -53,37 +53,37 @@
 
 (ert-deftest shrink-path/home-tilde-depth=1 ()
   (should (equal
-           (shrink-path "~/Projects/")
+           (shrink-path (f-canonical "~/Projects/"))
            "~/Projects/")))
 
 (ert-deftest shrink-path/home-tilde-depth=1-hidden ()
   (should (equal
-           (shrink-path "~/.config/")
+           (shrink-path (f-canonical "~/.config/"))
            "~/.config/")))
 
 (ert-deftest shrink-path/home-tilde-depth>1-last-hidden ()
   (should (equal
-           (shrink-path "~/Projects/dotfiles/emacs/.emacs.d")
+           (shrink-path (f-canonical "~/Projects/dotfiles/emacs/.emacs.d"))
            "~/P/d/e/.emacs.d/")))
 
 (ert-deftest shrink-path/home-tilde-depth>1-last-regular ()
   (should (equal
-           (shrink-path "~/Projects/dotfiles/emacs/.emacs.d/modules")
+           (shrink-path (f-canonical "~/Projects/dotfiles/emacs/.emacs.d/modules"))
            "~/P/d/e/.e/modules/")))
 
 (ert-deftest shrink-path/home-absolute-depth>1-last-hidden ()
   (should (equal
-           (shrink-path "/home/benny/Projects/dotfiles/emacs/.emacs.d")
+           (shrink-path (s-concat (getenv "HOME") "/Projects/dotfiles/emacs/.emacs.d"))
            "~/P/d/e/.emacs.d/")))
 
 (ert-deftest shrink-path/home-absolute-depth>1-last-regular ()
   (should (equal
-           (shrink-path "/home/benny/Projects/dotfiles/emacs/.emacs.d/modules")
+           (shrink-path (s-concat (getenv "HOME") "/Projects/dotfiles/emacs/.emacs.d/modules"))
            "~/P/d/e/.e/modules/")))
 
 (ert-deftest shrink-path/home-tilde-depth>1-middle-hidden ()
   (should (equal
-           (shrink-path "~/Projects/.dotfiles/zsh")
+           (shrink-path (f-canonical "~/Projects/.dotfiles/zsh"))
            "~/P/.d/zsh/")))
 
 
