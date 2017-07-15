@@ -43,17 +43,24 @@
      ((s-equals? (f-short path) "~") "~/")
 
      ((f-descendant-of? path "~")
-      (let ((shrunked (-map (lambda (segment)
-                              (s-left (if (s-starts-with? "." segment) 2 1)
-                                      segment))
-                            (-> split (-slice 3 -1)))))
-        (s-concat "~/" (s-join "/" shrunked) "/" (s-join "" (last split)) "/")))
+      (let ((diff (-difference split
+                               (f-split (getenv "HOME")))))
+        (if (= 1 (length diff))
+            (s-concat "~/" (car diff) "/")
+          (let ((shrunked (-map (lambda (segment)
+                                  (s-left (if (s-starts-with? "." segment) 2 1)
+                                          segment))
+                                (-> split (-slice 3 -1)))))
+            (s-concat "~/" (s-join "/" shrunked) "/" (s-join "" (last split)) "/")))))
      (t
-      (let ((shrunked (-map (lambda (segment)
-                              (s-left (if (s-starts-with? "." segment) 2 1)
-                                      segment))
-                            (-> split (-slice 1 -1)))))
-        (s-concat "/" (s-join "/" shrunked) "/" (s-join "" (last split)) "/"))))))
+      (if (= (length split) 2)
+          (s-concat (s-join "" split) "/")
+        (let ((shrunked (-map (lambda (segment)
+                                (s-left (if (s-starts-with? "." segment) 2 1)
+                                        segment))
+                              (-> split (-slice 1 -1)))))
+          (s-concat "/" (s-join "/" shrunked) "/" (s-join "" (last split)) "/")))))))
+
 
 
 (provide 'shrink-path)
