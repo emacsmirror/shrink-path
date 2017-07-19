@@ -2,40 +2,38 @@ image: bandresen/alpine-emacs
 
 before_script:
   - cask list
-  - cask --dev --verbose
+  - make cask
   
 after_script:
   - emacs --version | head -n 1
 
-build:
+make_build:
  stage: build
+ # upload to later stages to save time in latter stages
  artifacts:
    paths:
      - .cask/
      - build.log
    expire_in: 5 minutes
  script:
-   - cask build 2>&1 | tee build.log
+   - make build 2>&1 | tee build.log
    - "# If :Error: is found in build.log, this test fails"
    - "[ $(grep ':Error:' build.log | wc -l) -eq 0 ]"
 
-warnings:
+make_build_warnings:
  stage: test
- dependencies: [build]
  script:
    - cat build.log
    - "# If :Warning: is found in build.log, this test fails"
    - "[ $(grep ':Warning:' build.log | wc -l) -eq 0 ]"
 
-checkdoc:
+make_checkdoc:
   stage: test
-  dependencies: [build]
   script:
-    - cask exec emacs --batch -Q -l test/test-checkdoc.el 2>&1 | tee checkdoc.log
+    - make checkdoc 2>&1 | tee checkdoc.log
     - "[ $(grep 'Warning' checkdoc.log | wc -l) -eq 0 ]"
 
-ert-runner:
+make_test:
  stage: test
- dependencies: [build]
  script:
-   - cask exec ert-runner --reporter ert+duration --verbose
+   - make test
