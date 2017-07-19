@@ -3,7 +3,7 @@
 ;; Copyright (C) 2017 Benjamin Andresen
 
 ;; Author: Benjamin Andresen
-;; Version: 0.0.1
+;; Version: 0.1.0
 ;; Keywords: path
 ;; URL: http://github.com/shrink-path.el/shrink-path.el
 ;; Package-Requires: ((s "1.6.1") (dash "1.8.0") (f "0.10.0"))
