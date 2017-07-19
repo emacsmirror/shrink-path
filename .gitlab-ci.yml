@@ -27,6 +27,13 @@ warnings:
    - "# If :Warning: is found in build.log, this test fails"
    - "[ $(grep ':Warning:' build.log | wc -l) -eq 0 ]"
 
+checkdoc:
+  stage: test
+  dependencies: [build]
+  script:
+    - cask exec emacs --batch -Q -l test/test-checkdoc.el 2>&1 | tee checkdoc.log
+    - "[ $(grep 'Warning' checkdoc.log | wc -l) -eq 0 ]"
+
 ert-runner:
  stage: test
  dependencies: [build]
