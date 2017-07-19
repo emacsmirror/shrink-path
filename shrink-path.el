@@ -34,6 +34,8 @@
 (require 'f)
 
 (defun shrink-path--home (split)
+  "Take SPLIT list and return fishy-style shrunk path.
+Will only work on directories below `$HOME'"
   (let ((diff (-difference split
                            (f-split (getenv "HOME")))))
     (if (= 1 (length diff))
@@ -45,6 +47,8 @@
         (s-concat "~/" (s-join "/" shrunked) "/" (s-join "" (last split)) "/")))))
 
 (defun shrink-path--not-home (split)
+  "Take SPLIT list and return fishy-style shrunk path.
+Will only work on directories not below `$HOME'"
   (if (= (length split) 2)
           (s-concat (s-join "" split) "/")
         (let ((shrunked (-map (lambda (segment)
