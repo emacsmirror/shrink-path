@@ -31,69 +31,14 @@
 ;;; Code:
 (require 'shrink-path)
 
-(ert-deftest shrink-path/root ()
-  (should (equal (shrink-path "/") "/")))
-
-(ert-deftest shrink-path/home-tilde ()
-  (with-home "/home/test"
-             (should (equal (shrink-path "~") "~/"))))
-
+;;
+;; home-absolute
+;;
 (ert-deftest shrink-path/home-absolute ()
   (with-home "/home/test"
              (should
               (equal (shrink-path "/home/test")
                      "~/"))))
-
-(ert-deftest shrink-path/root-depth=1 ()
-  (should (equal (shrink-path "/tmp") "/tmp/")))
-
-(ert-deftest shrink-path/root-depth>1-last-regular ()
-  (should (equal
-           (shrink-path "/etc/X11/xorg.conf.d")
-           "/e/X/xorg.conf.d/")))
-
-(ert-deftest shrink-path/root-depth=1-hidden ()
-  (should (equal (shrink-path "/.snapshotz") "/.snapshotz/")))
-
-(ert-deftest shrink-path/root-depth>1-middle-hidden ()
-  (should (equal
-           (shrink-path "/etc/openvpn/.certificates/london")
-           "/e/o/.c/london/")))
-
-(ert-deftest shrink-path/root-depth>1-last-hidden ()
-  (should (equal
-           (shrink-path "/etc/openvpn/.certificates")
-           "/e/o/.certificates/")))
-
-(ert-deftest shrink-path/home-tilde-depth=1 ()
-  (with-home "/home/test"
-             (should (equal
-                      (shrink-path "~/Projects/")
-                      "~/Projects/"))))
-
-(ert-deftest shrink-path/home-tilde-depth=1-hidden ()
-  (with-home "/home/test"
-             (should (equal
-                      (shrink-path "~/.config/")
-                      "~/.config/"))))
-
-(ert-deftest shrink-path/home-tilde-depth>1-middle-hidden ()
-  (with-home "/home/test"
-             (should (equal
-                      (shrink-path  "~/Projects/.dotfiles/zsh")
-                      "~/P/.d/zsh/"))))
-
-(ert-deftest shrink-path/home-tilde-depth>1-last-hidden ()
-  (with-home "/home/test"
-             (should (equal
-                      (shrink-path "~/Projects/dotfiles/emacs/.emacs.d")
-                      "~/P/d/e/.emacs.d/"))))
-
-(ert-deftest shrink-path/home-tilde-depth>1-last-regular ()
-  (with-home "/home/test"
-             (should (equal
-                      (shrink-path "~/Projects/dotfiles/emacs/.emacs.d/modules")
-                      "~/P/d/e/.e/modules/"))))
 
 (ert-deftest shrink-path/home-absolute-depth=1 ()
   (with-home "/home/test"
@@ -107,12 +52,6 @@
                       (shrink-path "/home/test/.config/")
                       "~/.config/"))))
 
-(ert-deftest shrink-path/home-absolute-depth>1-middle-hidden ()
-  (with-home "/home/test"
-             (should (equal
-                      (shrink-path  "/home/test/Projects/.dotfiles/zsh")
-                      "~/P/.d/zsh/"))))
-
 (ert-deftest shrink-path/home-absolute-depth>1-last-hidden ()
   (with-home "/home/test"
              (should
@@ -125,6 +64,75 @@
              (should (equal
                       (shrink-path "/home/test/Projects/dotfiles/emacs/.emacs.d/modules")
                       "~/P/d/e/.e/modules/"))))
+
+(ert-deftest shrink-path/home-absolute-depth>1-middle-hidden ()
+  (with-home "/home/test"
+             (should (equal
+                      (shrink-path  "/home/test/Projects/.dotfiles/zsh")
+                      "~/P/.d/zsh/"))))
+
+;;
+;; home-tilde
+;;
+(ert-deftest shrink-path/home-tilde ()
+  (with-home "/home/test"
+             (should (equal (shrink-path "~") "~/"))))
+
+(ert-deftest shrink-path/home-tilde-depth=1 ()
+  (with-home "/home/test"
+             (should (equal
+                      (shrink-path "~/Projects/")
+                      "~/Projects/"))))
+
+(ert-deftest shrink-path/home-tilde-depth=1-hidden ()
+  (with-home "/home/test"
+             (should (equal
+                      (shrink-path "~/.config/")
+                      "~/.config/"))))
+
+(ert-deftest shrink-path/home-tilde-depth>1-last-hidden ()
+  (with-home "/home/test"
+             (should (equal
+                      (shrink-path "~/Projects/dotfiles/emacs/.emacs.d")
+                      "~/P/d/e/.emacs.d/"))))
+
+(ert-deftest shrink-path/home-tilde-depth>1-last-regular ()
+  (with-home "/home/test"
+             (should (equal
+                      (shrink-path "~/Projects/dotfiles/emacs/.emacs.d/modules")
+                      "~/P/d/e/.e/modules/"))))
+
+(ert-deftest shrink-path/home-tilde-depth>1-middle-hidden ()
+  (with-home "/home/test"
+             (should (equal
+                      (shrink-path  "~/Projects/.dotfiles/zsh")
+                      "~/P/.d/zsh/"))))
+
+;;
+;; root
+;;
+(ert-deftest shrink-path/root ()
+  (should (equal (shrink-path "/") "/")))
+
+(ert-deftest shrink-path/root-depth=1 ()
+  (should (equal (shrink-path "/tmp") "/tmp/")))
+
+(ert-deftest shrink-path/root-depth=1-hidden ()
+  (should (equal (shrink-path "/.snapshotz") "/.snapshotz/")))
+
+(ert-deftest shrink-path/root-depth>1-last-hidden ()
+  (should (equal
+           (shrink-path "/etc/openvpn/.certificates")
+           "/e/o/.certificates/")))
+(ert-deftest shrink-path/root-depth>1-last-regular ()
+  (should (equal
+           (shrink-path "/etc/X11/xorg.conf.d")
+           "/e/X/xorg.conf.d/")))
+
+(ert-deftest shrink-path/root-depth>1-middle-hidden ()
+  (should (equal
+           (shrink-path "/etc/openvpn/.certificates/london")
+           "/e/o/.c/london/")))
 
 (provide 'shrink-path-test)
 ;;; shrink-path-test.el ends here

@@ -1,11 +1,11 @@
 image: bandresen/alpine-emacs
 
 before_script:
+  - cask list
   - cask --dev --verbose
   
 after_script:
-  - cask list
-  - emacs --version
+  - emacs --version | head -n 1
 
 build:
  stage: build
