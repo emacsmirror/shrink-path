@@ -17,14 +17,12 @@ make_build:
    expire_in: 5 minutes
  script:
    - make build 2>&1 | tee build.log
-   - "# If :Error: is found in build.log, this test fails"
    - "[ $(grep ':Error:' build.log | wc -l) -eq 0 ]"
 
 make_build_warnings:
  stage: test
  script:
    - cat build.log
-   - "# If :Warning: is found in build.log, this test fails"
    - "[ $(grep ':Warning:' build.log | wc -l) -eq 0 ]"
 
 make_checkdoc:
