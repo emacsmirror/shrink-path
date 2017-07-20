@@ -57,6 +57,7 @@ Will only work on directories not below `$HOME'"
                               (-> split (-slice 1 -1)))))
           (s-concat "/" (s-join "/" shrunked) "/" (s-join "" (last split)) "/"))))
 
+;;;###autoload
 (defun shrink-path (&optional path)
   "Given PATH return fish-styled shrunken down path."
   (let* ((path (or path default-directory))
@@ -69,7 +70,17 @@ Will only work on directories not below `$HOME'"
      ((f-descendant-of? path "~") (shrink-path--home split))
      (t (shrink-path--not-home split)))))
 
-
+;;;###autoload
+(defun shrink-path-prompt (&optional pwd)
+  "Return cons of BASE and DIR for PWD."
+  (let* ((pwd (or pwd default-directory))
+         (shrunk (shrink-path pwd))
+         (split (-as-> shrunk it (s-split "/" it 'omit-nulls)))
+         base dir)
+    (setq dir (or (-last-item split) "/"))
+    (setq base (if (s-equals? dir "/") ""
+                 (s-chop-suffix (s-concat dir "/") shrunk)))
+    (cons base dir)))
 
 (provide 'shrink-path)
 ;;; shrink-path.el ends here

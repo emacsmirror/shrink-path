@@ -31,6 +31,7 @@
 ;;; Code:
 (require 'shrink-path)
 
+;;; shrink-path
 ;;
 ;; home-absolute
 ;;
@@ -133,6 +134,111 @@
   (should (equal
            (shrink-path "/etc/openvpn/.certificates/london")
            "/e/o/.c/london/")))
+
+;;; shrink-path-prompt
+;;
+;; home-absolute
+;;
+(ert-deftest shrink-path/home-absolute ()
+  (with-home "/home/test"
+             (should
+              (equal (shrink-path-prompt "/home/test")
+                     (cons "" "~")))))
+
+(ert-deftest shrink-path-prompt/home-absolute-depth=1 ()
+  (with-home "/home/test"
+             (should (equal
+                      (shrink-path-prompt "/home/test/Projects/")
+                      (cons "~/" "Projects")))))
+
+(ert-deftest shrink-path-prompt/home-absolute-depth=1-hidden ()
+  (with-home "/home/test"
+             (should (equal
+                      (shrink-path-prompt "/home/test/.config/")
+                      (cons "~/" ".config")))))
+
+(ert-deftest shrink-path-prompt/home-absolute-depth>1-last-hidden ()
+  (with-home "/home/test"
+             (should
+              (equal
+               (shrink-path-prompt "/home/test/Projects/dotfiles/emacs/.emacs.d")
+               (cons "~/P/d/e/" ".emacs.d")))))
+
+(ert-deftest shrink-path-prompt/home-absolute-depth>1-last-regular ()
+  (with-home "/home/test"
+             (should (equal
+                      (shrink-path-prompt "/home/test/Projects/dotfiles/emacs/.emacs.d/modules")
+                      (cons "~/P/d/e/.e/" "modules")))))
+
+(ert-deftest shrink-path-prompt/home-absolute-depth>1-middle-hidden ()
+  (with-home "/home/test"
+             (should (equal
+                      (shrink-path-prompt  "/home/test/Projects/.dotfiles/zsh")
+                      (cons "~/P/.d/" "zsh")))))
+
+;;
+;; home-tilde
+;;
+(ert-deftest shrink-path-prompt/home-tilde ()
+  (with-home "/home/test"
+             (should (equal (shrink-path-prompt "~") (cons "" "~")))))
+
+(ert-deftest shrink-path-prompt/home-tilde-depth=1 ()
+  (with-home "/home/test"
+             (should (equal
+                      (shrink-path-prompt "~/Projects/")
+                      (cons "~/" "Projects")))))
+
+(ert-deftest shrink-path-prompt/home-tilde-depth=1-hidden ()
+  (with-home "/home/test"
+             (should (equal
+                      (shrink-path-prompt "~/.config/")
+                      (cons "~/" ".config")))))
+
+(ert-deftest shrink-path-prompt/home-tilde-depth>1-last-hidden ()
+  (with-home "/home/test"
+             (should (equal
+                      (shrink-path-prompt "~/Projects/dotfiles/emacs/.emacs.d")
+                      (cons "~/P/d/e/" ".emacs.d")))))
+
+(ert-deftest shrink-path-prompt/home-tilde-depth>1-last-regular ()
+  (with-home "/home/test"
+             (should (equal
+                      (shrink-path-prompt "~/Projects/dotfiles/emacs/.emacs.d/modules")
+                      (cons "~/P/d/e/.e/" "modules")))))
+
+(ert-deftest shrink-path-prompt/home-tilde-depth>1-middle-hidden ()
+  (with-home "/home/test"
+             (should (equal
+                      (shrink-path-prompt  "~/Projects/.dotfiles/zsh")
+                      (cons "~/P/.d/" "zsh")))))
+
+;;
+;; root
+;;
+(ert-deftest shrink-path-prompt/root ()
+  (should (equal (shrink-path-prompt "/") (cons "" "/"))))
+
+(ert-deftest shrink-path-prompt/root-depth=1 ()
+  (should (equal (shrink-path-prompt "/tmp") (cons "/" "tmp"))))
+
+(ert-deftest shrink-path-prompt/root-depth=1-hidden ()
+  (should (equal (shrink-path-prompt "/.snapshotz") (cons "/" ".snapshotz"))))
+
+(ert-deftest shrink-path-prompt/root-depth>1-last-hidden ()
+  (should (equal
+           (shrink-path-prompt "/etc/openvpn/.certificates")
+           (cons "/e/o/" ".certificates"))))
+
+(ert-deftest shrink-path-prompt/root-depth>1-last-regular ()
+  (should (equal
+           (shrink-path-prompt "/etc/X11/xorg.conf.d")
+           (cons "/e/X/" "xorg.conf.d"))))
+
+(ert-deftest shrink-path-prompt/root-depth>1-middle-hidden ()
+  (should (equal
+           (shrink-path-prompt "/etc/openvpn/.certificates/london")
+           (cons "/e/o/.c/" "london"))))
 
 (provide 'shrink-path-test)
 ;;; shrink-path-test.el ends here
