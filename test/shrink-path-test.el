@@ -41,6 +41,12 @@
               (equal (shrink-path "/home/test")
                      "~/"))))
 
+(ert-deftest shrink-path/home-absolute-trailing-slash ()
+  (with-home "/home/test"
+             (should
+              (equal (shrink-path "/home/test/")
+                     "~/"))))
+
 (ert-deftest shrink-path/home-absolute-depth=1 ()
   (with-home "/home/test"
              (should (equal
@@ -78,6 +84,10 @@
 (ert-deftest shrink-path/home-tilde ()
   (with-home "/home/test"
              (should (equal (shrink-path "~") "~/"))))
+
+(ert-deftest shrink-path/home-tilde-trailing-slash ()
+  (with-home "/home/test"
+             (should (equal (shrink-path "~/") "~/"))))
 
 (ert-deftest shrink-path/home-tilde-depth=1 ()
   (with-home "/home/test"
@@ -145,6 +155,12 @@
               (equal (shrink-path-prompt "/home/test")
                      (cons "" "~")))))
 
+(ert-deftest shrink-path/home-absolute-trailing-slash ()
+  (with-home "/home/test"
+             (should
+              (equal (shrink-path-prompt "/home/test/")
+                     (cons "" "~")))))
+
 (ert-deftest shrink-path-prompt/home-absolute-depth=1 ()
   (with-home "/home/test"
              (should (equal
@@ -182,6 +198,10 @@
 (ert-deftest shrink-path-prompt/home-tilde ()
   (with-home "/home/test"
              (should (equal (shrink-path-prompt "~") (cons "" "~")))))
+
+(ert-deftest shrink-path-prompt/home-tilde-trailing-slash ()
+  (with-home "/home/test"
+             (should (equal (shrink-path-prompt "~/") (cons "" "~")))))
 
 (ert-deftest shrink-path-prompt/home-tilde-depth=1 ()
   (with-home "/home/test"
