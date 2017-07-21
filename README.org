@@ -1,0 +1,9 @@
+#+TITLE: shrink-path.el
+#+AUTHOR: Benjamin Andresen
+
+Small utility functions that allow for fish-style trunctated directories in
+eshell and for example modeline.
+
+#+html: <p align="center">
+#+html: <img src="//gitlab.com/bennya/shrink-path.el/raw/screenshots/eshell-prompt.png" />
+#+html: </p>
