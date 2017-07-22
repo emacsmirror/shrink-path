@@ -82,5 +82,12 @@ directory too."
                  (s-chop-suffix (s-concat dir "/") shrunk)))
     (cons base dir)))
 
+;;;###autoload
+(defun shrink-path-file (file)
+  "Return FILE's shrunk down path and filename."
+  (let ((filename (f-filename file))
+        (dirname (f-dirname file)))
+    (s-concat (shrink-path dirname) filename)))
+
 (provide 'shrink-path)
 ;;; shrink-path.el ends here
