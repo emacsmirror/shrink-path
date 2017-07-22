@@ -33,42 +33,42 @@
 (require 's)
 (require 'f)
 
-(defun shrink-path--home (split)
-  "Take SPLIT list and return fishy-style shrunk path.
-Will only work on directories below `$HOME'"
-  (let ((diff (-difference split
-                           (f-split (getenv "HOME")))))
-    (if (= 1 (length diff))
-        (s-concat "~/" (car diff) "/")
-      (let ((shrunked (-map (lambda (segment)
-                              (s-left (if (s-starts-with? "." segment) 2 1)
-                                      segment))
-                            (-> split (-slice 3 -1)))))
-        (s-concat "~/" (s-join "/" shrunked) "/" (s-join "" (last split)) "/")))))
+(defun shrink-path--truncate (str)
+  "Return STR's first character or first two characters if hidden."
+  (substring str 0 (if (s-starts-with? "." str) 2 1)))
 
-(defun shrink-path--not-home (split)
-  "Take SPLIT list and return fishy-style shrunk path.
-Will only work on directories not below `$HOME'"
-  (if (= (length split) 2)
-          (s-concat (s-join "" split) "/")
-        (let ((shrunked (-map (lambda (segment)
-                                (s-left (if (s-starts-with? "." segment) 2 1)
-                                        segment))
-                              (-> split (-slice 1 -1)))))
-          (s-concat "/" (s-join "/" shrunked) "/" (s-join "" (last split)) "/"))))
+(defun shrink-path--internal (full-path &optional truncate-all)
+  "Return fish-style truncated string based on FULL-PATH.
+Optional parameter TRUNCATE-ALL will cause the function to truncate the last
+directory too."
+  (let* ((home (getenv "HOME"))
+         (path (replace-regexp-in-string
+                (s-concat "^" home) "~" full-path))
+         (split (s-split "/" path 'omit-nulls))
+         (split-len (length split))
+         shrunk)
+    (->> split
+         (--map-indexed (if (= it-index (1- split-len))
+                            (if truncate-all (shrink-path--truncate it) it)
+                          (shrink-path--truncate it)))
+         (s-join "/")
+         (setq shrunk))
+    (s-concat (unless (s-matches? (rx bos (or "~" "/")) shrunk) "/")
+              shrunk
+              (unless (s-ends-with? "/" shrunk) "/"))))
+
 
 ;;;###autoload
-(defun shrink-path (&optional path)
-  "Given PATH return fish-styled shrunken down path."
+(defun shrink-path (&optional path truncate-all)
+  "Given PATH return fish-styled shrunken down path.
+Optional parameter TRUNCATE-ALL will cause the function to truncate the last
+directory too."
   (let* ((path (or path default-directory))
-         (path (f-full path))
-         (split (f-split path)))
+         (path (f-full path)))
     (cond
      ((s-equals? (f-short path) "/") "/")
-     ((s-equals? (f-short path) "~") "~/")
-     ((s-equals? (f-short path) "~/") "~/")
-     ((f-descendant-of? path "~") (shrink-path--home split))
-     (t (shrink-path--not-home split)))))
+     ((s-matches? (rx bos (or "~" "/") eos) "~/"))
+     (t (shrink-path--internal path truncate-all)))))
 
 ;;;###autoload
 (defun shrink-path-prompt (&optional pwd)
