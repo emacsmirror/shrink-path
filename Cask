@@ -7,6 +7,5 @@
  (depends-on "f")
  (depends-on "dash")
  (depends-on "s")
- (depends-on "ecukes")
- (depends-on "ert-runner")
- (depends-on "el-mock"))
+ (depends-on "buttercup")
+ (depends-on "ert-runner"))

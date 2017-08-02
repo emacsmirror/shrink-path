@@ -29,236 +29,259 @@
 ;;; No commentary
 
 ;;; Code:
+(load "test/test-helper.el")
+
 (require 'shrink-path)
 
-;;; shrink-path
-;;
-;; home-absolute
-;;
-(ert-deftest shrink-path/home-absolute ()
-  (with-home "/home/test"
-             (should
-              (equal (shrink-path "/home/test")
-                     "~/"))))
+(describe "shrink-path"
+  (describe "using absolute path"
+     (describe "home"
+       (describe "path equals home"
+         (it "trailing slash"
+           (expect (with-home "/home/test"
+                              (shrink-path "/home/test/"))
+                   :to-equal
+                   "~/"))
+         (it "no trailing slash"
+             (expect (with-home "/home/test"
+                                (shrink-path "/home/test"))
+                     :to-equal
+                     "~/")))
+       (describe "path equals home+1"
+         (it "trailing slash"
+             (expect (with-home "/home/test"
+                                (shrink-path "/home/test/Projects/"))
+                     :to-equal
+                     "~/Projects/"))
+         (it "no trailing slash"
+             (expect (with-home "/home/test"
+                                (shrink-path "/home/test/Projects"))
+                     :to-equal
+                     "~/Projects/"))
+         (it "hidden"
+             (expect (with-home "/home/test"
+                                (shrink-path "/home/test/.config/"))
+                     :to-equal
+                     "~/.config/")))
 
-(ert-deftest shrink-path/home-absolute-trailing-slash ()
-  (with-home "/home/test"
-             (should
-              (equal (shrink-path "/home/test/")
-                     "~/"))))
+       (describe "path larger home+1"
+         (it "no trailing slash"
+             (expect (with-home "/home/test"
+                                (shrink-path "/home/test/Projects/dotfiles"))
+                     :to-equal
+                     "~/P/dotfiles/"))
+         (it "trailing slash"
+             (expect (with-home "/home/test"
+                                (shrink-path "/home/test/Projects/dotfiles/"))
+                     :to-equal
+                     "~/P/dotfiles/"))
+         (it "last hidden"
+             (expect (with-home "/home/test"
+                                (shrink-path "/home/test/Projects/dotfiles/.emacs.d"))
+                     :to-equal
+                     "~/P/d/.emacs.d/"))
+         (it "middle hidden"
+             (expect (with-home "/home/test"
+                                (shrink-path "/home/test/.config/mpv"))
+                     :to-equal
+                     "~/.c/mpv/"))))
 
-(ert-deftest shrink-path/home-absolute-depth=1 ()
-  (with-home "/home/test"
-             (should (equal
-                      (shrink-path "/home/test/Projects/")
-                      "~/Projects/"))))
+     (describe "root"
+       (it "root only"
+           (expect (shrink-path "/") :to-equal "/"))
+       (describe "root depth equals 1"
+         (it "regular"
+             (expect (shrink-path "/tmp") :to-equal "/tmp/"))
+         (it "hidden"
+             (expect (shrink-path "/.snapshotz") :to-equal "/.snapshotz/")))
+       (describe "root depth larger than 1"
+         (it "last regular"
+             (expect (shrink-path "/etc/X11/xorg.conf.d")
+                     :to-equal "/e/X/xorg.conf.d/"))
+         (it "last hidden"
+             (expect (shrink-path "/etc/openvpn/.certificates")
+                     :to-equal "/e/o/.certificates/")))
+         (it "middle hidden"
+             (expect (shrink-path "/etc/openvpn/.certificates/london")
+                     :to-equal "/e/o/.c/london/"))))
 
-(ert-deftest shrink-path/home-absolute-depth=1-hidden ()
-  (with-home "/home/test"
-             (should (equal
-                      (shrink-path "/home/test/.config/")
-                      "~/.config/"))))
 
-(ert-deftest shrink-path/home-absolute-depth>1-last-hidden ()
-  (with-home "/home/test"
-             (should
-              (equal
-               (shrink-path "/home/test/Projects/dotfiles/emacs/.emacs.d")
-               "~/P/d/e/.emacs.d/"))))
+  (describe "tilde path"
+    (describe "home"
+       (describe "path equals home"
+         (it "trailing slash"
+           (expect (with-home "/home/test"
+                              (shrink-path "~/"))
+                   :to-equal
+                   "~/"))
+         (it "no trailing slash"
+             (expect (with-home "/home/test"
+                                (shrink-path "~/"))
+                     :to-equal
+                     "~/")))
+       (describe "path equals home+1"
+         (it "trailing slash"
+             (expect (with-home "/home/test"
+                                (shrink-path "~/Projects/"))
+                     :to-equal
+                     "~/Projects/"))
+         (it "no trailing slash"
+             (expect (with-home "/home/test"
+                                (shrink-path "~/Projects"))
+                     :to-equal
+                     "~/Projects/"))
+         (it "hidden"
+             (expect (with-home "/home/test"
+                                (shrink-path "~/.config/"))
+                     :to-equal
+                     "~/.config/")))
 
-(ert-deftest shrink-path/home-absolute-depth>1-last-regular ()
-  (with-home "/home/test"
-             (should (equal
-                      (shrink-path "/home/test/Projects/dotfiles/emacs/.emacs.d/modules")
-                      "~/P/d/e/.e/modules/"))))
+       (describe "path larger home+1"
+         (it "no trailing slash"
+             (expect (with-home "/home/test"
+                                (shrink-path "~/Projects/dotfiles"))
+                     :to-equal
+                     "~/P/dotfiles/"))
+         (it "trailing slash"
+             (expect (with-home "/home/test"
+                                (shrink-path "~/Projects/dotfiles/"))
+                     :to-equal
+                     "~/P/dotfiles/"))
+         (it "last hidden"
+             (expect (with-home "/home/test"
+                                (shrink-path "~/Projects/dotfiles/.emacs.d"))
+                     :to-equal
+                     "~/P/d/.emacs.d/"))
+         (it "middle hidden"
+             (expect (with-home "/home/test"
+                                (shrink-path "~/.config/mpv"))
+                     :to-equal
+                     "~/.c/mpv/"))))))
 
-(ert-deftest shrink-path/home-absolute-depth>1-middle-hidden ()
-  (with-home "/home/test"
-             (should (equal
-                      (shrink-path  "/home/test/Projects/.dotfiles/zsh")
-                      "~/P/.d/zsh/"))))
+(describe "shrink-path-prompt"
+  (describe "using absolute path"
+     (describe "home"
+       (describe "path equals home"
+         (it "trailing slash"
+           (expect (with-home "/home/test"
+                              (shrink-path-prompt "/home/test/"))
+                   :to-equal
+                   '("" . "~")))
+         (it "no trailing slash"
+             (expect (with-home "/home/test"
+                                (shrink-path-prompt "/home/test"))
+                     :to-equal
+                     '("" . "~"))))
+       (describe "path equals home+1"
+         (it "trailing slash"
+             (expect (with-home "/home/test"
+                                (shrink-path-prompt "/home/test/Projects/"))
+                     :to-equal
+                     '("~/" . "Projects")))
+         (it "no trailing slash"
+             (expect (with-home "/home/test"
+                                (shrink-path-prompt "/home/test/Projects"))
+                     :to-equal
+                     '("~/" . "Projects")))
+         (it "hidden"
+             (expect (with-home "/home/test"
+                                (shrink-path-prompt "/home/test/.config/"))
+                     :to-equal
+                     '("~/" . ".config"))))
 
-;;
-;; home-tilde
-;;
-(ert-deftest shrink-path/home-tilde ()
-  (with-home "/home/test"
-             (should (equal (shrink-path "~") "~/"))))
+       (describe "path larger home+1"
+         (it "no trailing slash"
+             (expect (with-home "/home/test"
+                                (shrink-path-prompt "/home/test/Projects/dotfiles"))
+                     :to-equal
+                     '("~/P/" . "dotfiles")))
+         (it "trailing slash"
+             (expect (with-home "/home/test"
+                                (shrink-path-prompt "/home/test/Projects/dotfiles/"))
+                     :to-equal
+                     '("~/P/" . "dotfiles")))
+         (it "last hidden"
+             (expect (with-home "/home/test"
+                                (shrink-path-prompt "/home/test/Projects/dotfiles/.emacs.d"))
+                     :to-equal
+                     '("~/P/d/" . ".emacs.d")))
+         (it "middle hidden"
+             (expect (with-home "/home/test"
+                                (shrink-path-prompt "/home/test/.config/mpv"))
+                     :to-equal
+                     '("~/.c/" . "mpv")))))
 
-(ert-deftest shrink-path/home-tilde-trailing-slash ()
-  (with-home "/home/test"
-             (should (equal (shrink-path "~/") "~/"))))
+     (describe "root"
+       (it "root only"
+           (expect (shrink-path-prompt "/") :to-equal '("" . "/")))
+       (describe "root depth equals 1"
+         (it "regular"
+             (expect (shrink-path-prompt "/tmp") :to-equal '("/" . "tmp")))
+         (it "hidden"
+             (expect (shrink-path-prompt "/.snapshotz") :to-equal '("/" . ".snapshotz"))))
+       (describe "root depth larger than 1"
+         (it "last regular"
+             (expect (shrink-path-prompt "/etc/X11/xorg.conf.d")
+                     :to-equal '("/e/X/" . "xorg.conf.d")))
+         (it "last hidden"
+             (expect (shrink-path-prompt "/etc/openvpn/.certificates")
+                     :to-equal '("/e/o/" . ".certificates")))
+         (it "middle hidden"
+             (expect (shrink-path-prompt "/etc/openvpn/.certificates/london")
+                     :to-equal '("/e/o/.c/" . "london"))))))
 
-(ert-deftest shrink-path/home-tilde-depth=1 ()
-  (with-home "/home/test"
-             (should (equal
-                      (shrink-path "~/Projects/")
-                      "~/Projects/"))))
 
-(ert-deftest shrink-path/home-tilde-depth=1-hidden ()
-  (with-home "/home/test"
-             (should (equal
-                      (shrink-path "~/.config/")
-                      "~/.config/"))))
+  (describe "tilde path"
+    (describe "home"
+       (describe "path equals home"
+         (it "trailing slash"
+           (expect (with-home "/home/test"
+                              (shrink-path-prompt "~/"))
+                   :to-equal
+                   '("" . "~")))
+         (it "no trailing slash"
+             (expect (with-home "/home/test"
+                                (shrink-path-prompt "~/"))
+                     :to-equal
+                     '("" . "~"))))
+       (describe "path equals home+1"
+         (it "trailing slash"
+             (expect (with-home "/home/test"
+                                (shrink-path-prompt "~/Projects/"))
+                     :to-equal
+                     '("~/" . "Projects")))
+         (it "no trailing slash"
+             (expect (with-home "/home/test"
+                                (shrink-path-prompt "~/Projects"))
+                     :to-equal
+                     '("~/" . "Projects")))
+         (it "hidden"
+             (expect (with-home "/home/test"
+                                (shrink-path-prompt "~/.config/"))
+                     :to-equal
+                     '("~/" . ".config"))))
 
-(ert-deftest shrink-path/home-tilde-depth>1-last-hidden ()
-  (with-home "/home/test"
-             (should (equal
-                      (shrink-path "~/Projects/dotfiles/emacs/.emacs.d")
-                      "~/P/d/e/.emacs.d/"))))
-
-(ert-deftest shrink-path/home-tilde-depth>1-last-regular ()
-  (with-home "/home/test"
-             (should (equal
-                      (shrink-path "~/Projects/dotfiles/emacs/.emacs.d/modules")
-                      "~/P/d/e/.e/modules/"))))
-
-(ert-deftest shrink-path/home-tilde-depth>1-middle-hidden ()
-  (with-home "/home/test"
-             (should (equal
-                      (shrink-path  "~/Projects/.dotfiles/zsh")
-                      "~/P/.d/zsh/"))))
-
-;;
-;; root
-;;
-(ert-deftest shrink-path/root ()
-  (should (equal (shrink-path "/") "/")))
-
-(ert-deftest shrink-path/root-depth=1 ()
-  (should (equal (shrink-path "/tmp") "/tmp/")))
-
-(ert-deftest shrink-path/root-depth=1-hidden ()
-  (should (equal (shrink-path "/.snapshotz") "/.snapshotz/")))
-
-(ert-deftest shrink-path/root-depth>1-last-hidden ()
-  (should (equal
-           (shrink-path "/etc/openvpn/.certificates")
-           "/e/o/.certificates/")))
-(ert-deftest shrink-path/root-depth>1-last-regular ()
-  (should (equal
-           (shrink-path "/etc/X11/xorg.conf.d")
-           "/e/X/xorg.conf.d/")))
-
-(ert-deftest shrink-path/root-depth>1-middle-hidden ()
-  (should (equal
-           (shrink-path "/etc/openvpn/.certificates/london")
-           "/e/o/.c/london/")))
-
-;;; shrink-path-prompt
-;;
-;; home-absolute
-;;
-(ert-deftest shrink-path/home-absolute ()
-  (with-home "/home/test"
-             (should
-              (equal (shrink-path-prompt "/home/test")
-                     (cons "" "~")))))
-
-(ert-deftest shrink-path/home-absolute-trailing-slash ()
-  (with-home "/home/test"
-             (should
-              (equal (shrink-path-prompt "/home/test/")
-                     (cons "" "~")))))
-
-(ert-deftest shrink-path-prompt/home-absolute-depth=1 ()
-  (with-home "/home/test"
-             (should (equal
-                      (shrink-path-prompt "/home/test/Projects/")
-                      (cons "~/" "Projects")))))
-
-(ert-deftest shrink-path-prompt/home-absolute-depth=1-hidden ()
-  (with-home "/home/test"
-             (should (equal
-                      (shrink-path-prompt "/home/test/.config/")
-                      (cons "~/" ".config")))))
-
-(ert-deftest shrink-path-prompt/home-absolute-depth>1-last-hidden ()
-  (with-home "/home/test"
-             (should
-              (equal
-               (shrink-path-prompt "/home/test/Projects/dotfiles/emacs/.emacs.d")
-               (cons "~/P/d/e/" ".emacs.d")))))
-
-(ert-deftest shrink-path-prompt/home-absolute-depth>1-last-regular ()
-  (with-home "/home/test"
-             (should (equal
-                      (shrink-path-prompt "/home/test/Projects/dotfiles/emacs/.emacs.d/modules")
-                      (cons "~/P/d/e/.e/" "modules")))))
-
-(ert-deftest shrink-path-prompt/home-absolute-depth>1-middle-hidden ()
-  (with-home "/home/test"
-             (should (equal
-                      (shrink-path-prompt  "/home/test/Projects/.dotfiles/zsh")
-                      (cons "~/P/.d/" "zsh")))))
-
-;;
-;; home-tilde
-;;
-(ert-deftest shrink-path-prompt/home-tilde ()
-  (with-home "/home/test"
-             (should (equal (shrink-path-prompt "~") (cons "" "~")))))
-
-(ert-deftest shrink-path-prompt/home-tilde-trailing-slash ()
-  (with-home "/home/test"
-             (should (equal (shrink-path-prompt "~/") (cons "" "~")))))
-
-(ert-deftest shrink-path-prompt/home-tilde-depth=1 ()
-  (with-home "/home/test"
-             (should (equal
-                      (shrink-path-prompt "~/Projects/")
-                      (cons "~/" "Projects")))))
-
-(ert-deftest shrink-path-prompt/home-tilde-depth=1-hidden ()
-  (with-home "/home/test"
-             (should (equal
-                      (shrink-path-prompt "~/.config/")
-                      (cons "~/" ".config")))))
-
-(ert-deftest shrink-path-prompt/home-tilde-depth>1-last-hidden ()
-  (with-home "/home/test"
-             (should (equal
-                      (shrink-path-prompt "~/Projects/dotfiles/emacs/.emacs.d")
-                      (cons "~/P/d/e/" ".emacs.d")))))
-
-(ert-deftest shrink-path-prompt/home-tilde-depth>1-last-regular ()
-  (with-home "/home/test"
-             (should (equal
-                      (shrink-path-prompt "~/Projects/dotfiles/emacs/.emacs.d/modules")
-                      (cons "~/P/d/e/.e/" "modules")))))
-
-(ert-deftest shrink-path-prompt/home-tilde-depth>1-middle-hidden ()
-  (with-home "/home/test"
-             (should (equal
-                      (shrink-path-prompt  "~/Projects/.dotfiles/zsh")
-                      (cons "~/P/.d/" "zsh")))))
-
-;;
-;; root
-;;
-(ert-deftest shrink-path-prompt/root ()
-  (should (equal (shrink-path-prompt "/") (cons "" "/"))))
-
-(ert-deftest shrink-path-prompt/root-depth=1 ()
-  (should (equal (shrink-path-prompt "/tmp") (cons "/" "tmp"))))
-
-(ert-deftest shrink-path-prompt/root-depth=1-hidden ()
-  (should (equal (shrink-path-prompt "/.snapshotz") (cons "/" ".snapshotz"))))
-
-(ert-deftest shrink-path-prompt/root-depth>1-last-hidden ()
-  (should (equal
-           (shrink-path-prompt "/etc/openvpn/.certificates")
-           (cons "/e/o/" ".certificates"))))
-
-(ert-deftest shrink-path-prompt/root-depth>1-last-regular ()
-  (should (equal
-           (shrink-path-prompt "/etc/X11/xorg.conf.d")
-           (cons "/e/X/" "xorg.conf.d"))))
-
-(ert-deftest shrink-path-prompt/root-depth>1-middle-hidden ()
-  (should (equal
-           (shrink-path-prompt "/etc/openvpn/.certificates/london")
-           (cons "/e/o/.c/" "london"))))
+       (describe "path larger home+1"
+         (it "no trailing slash"
+             (expect (with-home "/home/test"
+                                (shrink-path-prompt "~/Projects/dotfiles"))
+                     :to-equal
+                     '("~/P/" . "dotfiles")))
+         (it "trailing slash"
+             (expect (with-home "/home/test"
+                                (shrink-path-prompt "~/Projects/dotfiles/"))
+                     :to-equal
+                     '("~/P/" . "dotfiles")))
+         (it "last hidden"
+             (expect (with-home "/home/test"
+                                (shrink-path-prompt "~/Projects/dotfiles/.emacs.d"))
+                     :to-equal
+                     '("~/P/d/" . ".emacs.d")))
+         (it "middle hidden"
+             (expect (with-home "/home/test"
+                                (shrink-path-prompt "~/.config/mpv"))
+                     :to-equal
+                     '("~/.c/" . "mpv")))))))
 
 (provide 'shrink-path-test)
 ;;; shrink-path-test.el ends here

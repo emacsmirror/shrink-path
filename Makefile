@@ -9,7 +9,7 @@ build:
 	$(CASK) build
 
 test:
-	$(CASK) exec ert-runner --reporter ert --verbose
+	$(CASK) exec buttercup -L .
 
 checkdoc:
 	$(BEMACS) -l test/test-checkdoc.el

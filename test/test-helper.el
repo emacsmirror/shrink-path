@@ -18,7 +18,6 @@
            ,@body)
        (setenv "HOME" before))))
 
-
 (defvar shrink-path-el (expand-file-name "shrink-path.el" shrink-path-test/root-path))
 
 (load shrink-path-el 'noerror 'nomessage)
