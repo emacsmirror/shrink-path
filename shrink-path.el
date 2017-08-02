@@ -32,6 +32,7 @@
 (require 'dash)
 (require 's)
 (require 'f)
+(require 'rx)
 
 (defun shrink-path--truncate (str)
   "Return STR's first character or first two characters if hidden."
