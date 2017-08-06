@@ -72,6 +72,14 @@ directory too."
      (t (shrink-path--internal path truncate-all)))))
 
 ;;;###autoload
+(defun shrink-path-reverse (str &optional absolute-p)
+  "Given STR return expanded path.
+The path referred to by STR has to exist for this to work.
+If ABSOLUTE-P is t the returned path will be absolute."
+  ;; TODO
+  )
+
+;;;###autoload
 (defun shrink-path-prompt (&optional pwd)
   "Return cons of BASE and DIR for PWD."
   (let* ((pwd (or pwd default-directory))
@@ -90,6 +98,15 @@ TRUNCATE-ALL-DIRS controls if the tail directory should also be shrunk."
   (let ((filename (f-filename file))
         (dirname (f-dirname file)))
     (s-concat (shrink-path dirname truncate-all-dirs) filename)))
+
+;;;###autoload
+(defun shrink-path-file-reverse (str &optional exist-p absolute-p)
+  "Return STR's expanded filename.
+The path referred to by STR has to exist for this to work.
+If EXIST-P is t the filename also has to exist.
+If ABSOLUTE-P is t the returned path will be absolute."
+  ;; TODO
+  )
 
 (provide 'shrink-path)
 ;;; shrink-path.el ends here
