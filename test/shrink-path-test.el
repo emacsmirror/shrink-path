@@ -158,6 +158,17 @@
                   :to-equal
                   "~/.c/mpv/"))))))
 
+(describe "shrink-path-reverse"
+  (describe "multiple choice"
+    (it "every"
+      (expect (shrink-path-reverse "~/P/d/z/.zplugin")
+              :to-equal
+              "~/Projects/dotfiles/zsh/.zplugin")))
+  (describe "single choice"
+    (it "tail only"
+      (expect (shrink-path-reverse "~/.c/mpv")
+              :to-equal
+              "~/.config/mpv"))))
 
 (describe "shrink-path-prompt"
   (describe "using absolute path"

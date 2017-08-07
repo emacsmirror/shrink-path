@@ -76,8 +76,12 @@ directory too."
   "Given STR return expanded path.
 The path referred to by STR has to exist for this to work.
 If ABSOLUTE-P is t the returned path will be absolute."
-  ;; TODO
-  )
+  (->> (s-split "/" str)
+       (s-join "*/")
+       (s-replace "~*" "~")
+       f-glob
+       car
+       abbreviate-file-name))
 
 ;;;###autoload
 (defun shrink-path-prompt (&optional pwd)
