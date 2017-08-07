@@ -10,6 +10,7 @@
 
 (defmacro with-home (home &rest body)
   "Within HOME environment evaluate BODY."
+  (declare (indent 1))
   `(let ((abbreviated-home-dir nil) ; needed for interactive emacs
          (before (getenv "HOME")))
      (unwind-protect
