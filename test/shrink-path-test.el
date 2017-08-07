@@ -35,253 +35,256 @@
 
 (describe "shrink-path"
   (describe "using absolute path"
-     (describe "home"
-       (describe "path equals home"
-         (it "trailing slash"
-           (expect (with-home "/home/test"
-                              (shrink-path "/home/test/"))
-                   :to-equal
-                   "~/"))
-         (it "no trailing slash"
-             (expect (with-home "/home/test"
-                                (shrink-path "/home/test"))
-                     :to-equal
-                     "~/")))
-       (describe "path equals home+1"
-         (it "trailing slash"
-             (expect (with-home "/home/test"
-                                (shrink-path "/home/test/Projects/"))
-                     :to-equal
-                     "~/Projects/"))
-         (it "no trailing slash"
-             (expect (with-home "/home/test"
-                                (shrink-path "/home/test/Projects"))
-                     :to-equal
-                     "~/Projects/"))
-         (it "hidden"
-             (expect (with-home "/home/test"
-                                (shrink-path "/home/test/.config/"))
-                     :to-equal
-                     "~/.config/")))
+    (describe "home"
+      (describe "path equals home"
+        (it "trailing slash"
+          (expect (with-home "/home/test"
+                    (shrink-path "/home/test/"))
+                  :to-equal
+                  "~/"))
+        (it "no trailing slash"
+          (expect (with-home "/home/test"
+                    (shrink-path "/home/test"))
+                  :to-equal
+                  "~/")))
 
-       (describe "path larger home+1"
-         (it "no trailing slash"
-             (expect (with-home "/home/test"
-                                (shrink-path "/home/test/Projects/dotfiles"))
-                     :to-equal
-                     "~/P/dotfiles/"))
-         (it "trailing slash"
-             (expect (with-home "/home/test"
-                                (shrink-path "/home/test/Projects/dotfiles/"))
-                     :to-equal
-                     "~/P/dotfiles/"))
-         (it "last hidden"
-             (expect (with-home "/home/test"
-                                (shrink-path "/home/test/Projects/dotfiles/.emacs.d"))
-                     :to-equal
-                     "~/P/d/.emacs.d/"))
-         (it "middle hidden"
-             (expect (with-home "/home/test"
-                                (shrink-path "/home/test/.config/mpv"))
-                     :to-equal
-                     "~/.c/mpv/"))))
+      (describe "path equals home+1"
+        (it "trailing slash"
+          (expect (with-home "/home/test"
+                    (shrink-path "/home/test/Projects/"))
+                  :to-equal
+                  "~/Projects/"))
+        (it "no trailing slash"
+          (expect (with-home "/home/test"
+                    (shrink-path "/home/test/Projects"))
+                  :to-equal
+                  "~/Projects/"))
+        (it "hidden"
+          (expect (with-home "/home/test"
+                    (shrink-path "/home/test/.config/"))
+                  :to-equal
+                  "~/.config/")))
 
-     (describe "root"
-       (it "root only"
-           (expect (shrink-path "/") :to-equal "/"))
-       (describe "root depth equals 1"
-         (it "regular"
-             (expect (shrink-path "/tmp") :to-equal "/tmp/"))
-         (it "hidden"
-             (expect (shrink-path "/.snapshotz") :to-equal "/.snapshotz/")))
-       (describe "root depth larger than 1"
-         (it "last regular"
-             (expect (shrink-path "/etc/X11/xorg.conf.d")
-                     :to-equal "/e/X/xorg.conf.d/"))
-         (it "last hidden"
-             (expect (shrink-path "/etc/openvpn/.certificates")
-                     :to-equal "/e/o/.certificates/")))
-         (it "middle hidden"
-             (expect (shrink-path "/etc/openvpn/.certificates/london")
-                     :to-equal "/e/o/.c/london/"))))
+      (describe "path larger home+1"
+        (it "no trailing slash"
+          (expect (with-home "/home/test"
+                    (shrink-path "/home/test/Projects/dotfiles"))
+                  :to-equal
+                  "~/P/dotfiles/"))
+        (it "trailing slash"
+          (expect (with-home "/home/test"
+                    (shrink-path "/home/test/Projects/dotfiles/"))
+                  :to-equal
+                  "~/P/dotfiles/"))
+        (it "last hidden"
+          (expect (with-home "/home/test"
+                    (shrink-path "/home/test/Projects/dotfiles/.emacs.d"))
+                  :to-equal
+                  "~/P/d/.emacs.d/"))
+        (it "middle hidden"
+          (expect (with-home "/home/test"
+                    (shrink-path "/home/test/.config/mpv"))
+                  :to-equal
+                  "~/.c/mpv/"))))
 
+    (describe "root"
+      (it "root only"
+        (expect (shrink-path "/") :to-equal "/"))
+      (describe "root depth equals 1"
+        (it "regular"
+          (expect (shrink-path "/tmp") :to-equal "/tmp/"))
+        (it "hidden"
+          (expect (shrink-path "/.snapshotz") :to-equal "/.snapshotz/")))
+      (describe "root depth larger than 1"
+        (it "last regular"
+          (expect (shrink-path "/etc/X11/xorg.conf.d")
+                  :to-equal "/e/X/xorg.conf.d/"))
+        (it "last hidden"
+          (expect (shrink-path "/etc/openvpn/.certificates")
+                  :to-equal "/e/o/.certificates/")))
+      (it "middle hidden"
+        (expect (shrink-path "/etc/openvpn/.certificates/london")
+                :to-equal "/e/o/.c/london/"))))
 
   (describe "tilde path"
     (describe "home"
-       (describe "path equals home"
-         (it "trailing slash"
-           (expect (with-home "/home/test"
-                              (shrink-path "~/"))
-                   :to-equal
-                   "~/"))
-         (it "no trailing slash"
-             (expect (with-home "/home/test"
-                                (shrink-path "~/"))
-                     :to-equal
-                     "~/")))
-       (describe "path equals home+1"
-         (it "trailing slash"
-             (expect (with-home "/home/test"
-                                (shrink-path "~/Projects/"))
-                     :to-equal
-                     "~/Projects/"))
-         (it "no trailing slash"
-             (expect (with-home "/home/test"
-                                (shrink-path "~/Projects"))
-                     :to-equal
-                     "~/Projects/"))
-         (it "hidden"
-             (expect (with-home "/home/test"
-                                (shrink-path "~/.config/"))
-                     :to-equal
-                     "~/.config/")))
+      (describe "path equals home"
+        (it "trailing slash"
+          (expect (with-home "/home/test"
+                    (shrink-path "~/"))
+                  :to-equal
+                  "~/"))
+        (it "no trailing slash"
+          (expect (with-home "/home/test"
+                    (shrink-path "~/"))
+                  :to-equal
+                  "~/")))
+      (describe "path equals home+1"
+        (it "trailing slash"
+          (expect (with-home "/home/test"
+                    (shrink-path "~/Projects/"))
+                  :to-equal
+                  "~/Projects/"))
+        (it "no trailing slash"
+          (expect (with-home "/home/test"
+                    (shrink-path "~/Projects"))
+                  :to-equal
+                  "~/Projects/"))
+        (it "hidden"
+          (expect (with-home "/home/test"
+                    (shrink-path "~/.config/"))
+                  :to-equal
+                  "~/.config/")))
 
-       (describe "path larger home+1"
-         (it "no trailing slash"
-             (expect (with-home "/home/test"
-                                (shrink-path "~/Projects/dotfiles"))
-                     :to-equal
-                     "~/P/dotfiles/"))
-         (it "trailing slash"
-             (expect (with-home "/home/test"
-                                (shrink-path "~/Projects/dotfiles/"))
-                     :to-equal
-                     "~/P/dotfiles/"))
-         (it "last hidden"
-             (expect (with-home "/home/test"
-                                (shrink-path "~/Projects/dotfiles/.emacs.d"))
-                     :to-equal
-                     "~/P/d/.emacs.d/"))
-         (it "middle hidden"
-             (expect (with-home "/home/test"
-                                (shrink-path "~/.config/mpv"))
-                     :to-equal
-                     "~/.c/mpv/"))))))
+      (describe "path larger home+1"
+        (it "no trailing slash"
+          (expect (with-home "/home/test"
+                    (shrink-path "~/Projects/dotfiles"))
+                  :to-equal
+                  "~/P/dotfiles/"))
+        (it "trailing slash"
+          (expect (with-home "/home/test"
+                    (shrink-path "~/Projects/dotfiles/"))
+                  :to-equal
+                  "~/P/dotfiles/"))
+        (it "last hidden"
+          (expect (with-home "/home/test"
+                    (shrink-path "~/Projects/dotfiles/.emacs.d"))
+                  :to-equal
+                  "~/P/d/.emacs.d/"))
+        (it "middle hidden"
+          (expect (with-home "/home/test"
+                    (shrink-path "~/.config/mpv"))
+                  :to-equal
+                  "~/.c/mpv/"))))))
+
 
 (describe "shrink-path-prompt"
   (describe "using absolute path"
-     (describe "home"
-       (describe "path equals home"
-         (it "trailing slash"
-           (expect (with-home "/home/test"
-                              (shrink-path-prompt "/home/test/"))
-                   :to-equal
-                   '("" . "~")))
-         (it "no trailing slash"
-             (expect (with-home "/home/test"
-                                (shrink-path-prompt "/home/test"))
-                     :to-equal
-                     '("" . "~"))))
-       (describe "path equals home+1"
-         (it "trailing slash"
-             (expect (with-home "/home/test"
-                                (shrink-path-prompt "/home/test/Projects/"))
-                     :to-equal
-                     '("~/" . "Projects")))
-         (it "no trailing slash"
-             (expect (with-home "/home/test"
-                                (shrink-path-prompt "/home/test/Projects"))
-                     :to-equal
-                     '("~/" . "Projects")))
-         (it "hidden"
-             (expect (with-home "/home/test"
-                                (shrink-path-prompt "/home/test/.config/"))
-                     :to-equal
-                     '("~/" . ".config"))))
+    (describe "home"
+      (describe "path equals home"
+        (it "trailing slash"
+          (expect (with-home "/home/test"
+                    (shrink-path-prompt "/home/test/"))
+                  :to-equal
+                  '("" . "~")))
+        (it "no trailing slash"
+          (expect (with-home "/home/test"
+                    (shrink-path-prompt "/home/test"))
+                  :to-equal
+                  '("" . "~"))))
 
-       (describe "path larger home+1"
-         (it "no trailing slash"
-             (expect (with-home "/home/test"
-                                (shrink-path-prompt "/home/test/Projects/dotfiles"))
-                     :to-equal
-                     '("~/P/" . "dotfiles")))
-         (it "trailing slash"
-             (expect (with-home "/home/test"
-                                (shrink-path-prompt "/home/test/Projects/dotfiles/"))
-                     :to-equal
-                     '("~/P/" . "dotfiles")))
-         (it "last hidden"
-             (expect (with-home "/home/test"
-                                (shrink-path-prompt "/home/test/Projects/dotfiles/.emacs.d"))
-                     :to-equal
-                     '("~/P/d/" . ".emacs.d")))
-         (it "middle hidden"
-             (expect (with-home "/home/test"
-                                (shrink-path-prompt "/home/test/.config/mpv"))
-                     :to-equal
-                     '("~/.c/" . "mpv")))))
+      (describe "path equals home+1"
+        (it "trailing slash"
+          (expect (with-home "/home/test"
+                    (shrink-path-prompt "/home/test/Projects/"))
+                  :to-equal
+                  '("~/" . "Projects")))
+        (it "no trailing slash"
+          (expect (with-home "/home/test"
+                    (shrink-path-prompt "/home/test/Projects"))
+                  :to-equal
+                  '("~/" . "Projects")))
+        (it "hidden"
+          (expect (with-home "/home/test"
+                    (shrink-path-prompt "/home/test/.config/"))
+                  :to-equal
+                  '("~/" . ".config"))))
 
-     (describe "root"
-       (it "root only"
-           (expect (shrink-path-prompt "/") :to-equal '("" . "/")))
-       (describe "root depth equals 1"
-         (it "regular"
-             (expect (shrink-path-prompt "/tmp") :to-equal '("/" . "tmp")))
-         (it "hidden"
-             (expect (shrink-path-prompt "/.snapshotz") :to-equal '("/" . ".snapshotz"))))
-       (describe "root depth larger than 1"
-         (it "last regular"
-             (expect (shrink-path-prompt "/etc/X11/xorg.conf.d")
-                     :to-equal '("/e/X/" . "xorg.conf.d")))
-         (it "last hidden"
-             (expect (shrink-path-prompt "/etc/openvpn/.certificates")
-                     :to-equal '("/e/o/" . ".certificates")))
-         (it "middle hidden"
-             (expect (shrink-path-prompt "/etc/openvpn/.certificates/london")
-                     :to-equal '("/e/o/.c/" . "london"))))))
+      (describe "path larger home+1"
+        (it "no trailing slash"
+          (expect (with-home "/home/test"
+                    (shrink-path-prompt "/home/test/Projects/dotfiles"))
+                  :to-equal
+                  '("~/P/" . "dotfiles")))
+        (it "trailing slash"
+          (expect (with-home "/home/test"
+                    (shrink-path-prompt "/home/test/Projects/dotfiles/"))
+                  :to-equal
+                  '("~/P/" . "dotfiles")))
+        (it "last hidden"
+          (expect (with-home "/home/test"
+                    (shrink-path-prompt "/home/test/Projects/dotfiles/.emacs.d"))
+                  :to-equal
+                  '("~/P/d/" . ".emacs.d")))
+        (it "middle hidden"
+          (expect (with-home "/home/test"
+                    (shrink-path-prompt "/home/test/.config/mpv"))
+                  :to-equal
+                  '("~/.c/" . "mpv")))))
+
+    (describe "root"
+      (it "root only"
+        (expect (shrink-path-prompt "/") :to-equal '("" . "/")))
+      (describe "root depth equals 1"
+        (it "regular"
+          (expect (shrink-path-prompt "/tmp") :to-equal '("/" . "tmp")))
+        (it "hidden"
+          (expect (shrink-path-prompt "/.snapshotz") :to-equal '("/" . ".snapshotz"))))
+      (describe "root depth larger than 1"
+        (it "last regular"
+          (expect (shrink-path-prompt "/etc/X11/xorg.conf.d")
+                  :to-equal '("/e/X/" . "xorg.conf.d")))
+        (it "last hidden"
+          (expect (shrink-path-prompt "/etc/openvpn/.certificates")
+                  :to-equal '("/e/o/" . ".certificates")))
+        (it "middle hidden"
+          (expect (shrink-path-prompt "/etc/openvpn/.certificates/london")
+                  :to-equal '("/e/o/.c/" . "london"))))))
 
 
   (describe "tilde path"
     (describe "home"
-       (describe "path equals home"
-         (it "trailing slash"
-           (expect (with-home "/home/test"
-                              (shrink-path-prompt "~/"))
-                   :to-equal
-                   '("" . "~")))
-         (it "no trailing slash"
-             (expect (with-home "/home/test"
-                                (shrink-path-prompt "~/"))
-                     :to-equal
-                     '("" . "~"))))
-       (describe "path equals home+1"
-         (it "trailing slash"
-             (expect (with-home "/home/test"
-                                (shrink-path-prompt "~/Projects/"))
-                     :to-equal
-                     '("~/" . "Projects")))
-         (it "no trailing slash"
-             (expect (with-home "/home/test"
-                                (shrink-path-prompt "~/Projects"))
-                     :to-equal
-                     '("~/" . "Projects")))
-         (it "hidden"
-             (expect (with-home "/home/test"
-                                (shrink-path-prompt "~/.config/"))
-                     :to-equal
-                     '("~/" . ".config"))))
+      (describe "path equals home"
+        (it "trailing slash"
+          (expect (with-home "/home/test"
+                    (shrink-path-prompt "~/"))
+                  :to-equal
+                  '("" . "~")))
+        (it "no trailing slash"
+          (expect (with-home "/home/test"
+                    (shrink-path-prompt "~/"))
+                  :to-equal
+                  '("" . "~"))))
 
-       (describe "path larger home+1"
-         (it "no trailing slash"
-             (expect (with-home "/home/test"
-                                (shrink-path-prompt "~/Projects/dotfiles"))
-                     :to-equal
-                     '("~/P/" . "dotfiles")))
-         (it "trailing slash"
-             (expect (with-home "/home/test"
-                                (shrink-path-prompt "~/Projects/dotfiles/"))
-                     :to-equal
-                     '("~/P/" . "dotfiles")))
-         (it "last hidden"
-             (expect (with-home "/home/test"
-                                (shrink-path-prompt "~/Projects/dotfiles/.emacs.d"))
-                     :to-equal
-                     '("~/P/d/" . ".emacs.d")))
-         (it "middle hidden"
-             (expect (with-home "/home/test"
-                                (shrink-path-prompt "~/.config/mpv"))
-                     :to-equal
-                     '("~/.c/" . "mpv")))))))
+      (describe "path equals home+1"
+        (it "trailing slash"
+          (expect (with-home "/home/test"
+                    (shrink-path-prompt "~/Projects/"))
+                  :to-equal
+                  '("~/" . "Projects")))
+        (it "no trailing slash"
+          (expect (with-home "/home/test"
+                    (shrink-path-prompt "~/Projects"))
+                  :to-equal
+                  '("~/" . "Projects")))
+        (it "hidden"
+          (expect (with-home "/home/test"
+                    (shrink-path-prompt "~/.config/"))
+                  :to-equal
+                  '("~/" . ".config"))))
+
+      (describe "path larger home+1"
+        (it "no trailing slash"
+          (expect (with-home "/home/test"
+                    (shrink-path-prompt "~/Projects/dotfiles"))
+                  :to-equal
+                  '("~/P/" . "dotfiles")))
+        (it "trailing slash"
+          (expect (with-home "/home/test"
+                    (shrink-path-prompt "~/Projects/dotfiles/"))
+                  :to-equal
+                  '("~/P/" . "dotfiles")))
+        (it "last hidden"
+          (expect (with-home "/home/test"
+                    (shrink-path-prompt "~/Projects/dotfiles/.emacs.d"))
+                  :to-equal
+                  '("~/P/d/" . ".emacs.d")))
+        (it "middle hidden"
+          (expect (with-home "/home/test"
+                    (shrink-path-prompt "~/.config/mpv"))
+                  :to-equal
+                  '("~/.c/" . "mpv")))))))
 
 (provide 'shrink-path-test)
 ;;; shrink-path-test.el ends here
