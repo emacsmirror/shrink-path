@@ -73,15 +73,19 @@ directory too."
 
 ;;;###autoload
 (defun shrink-path-reverse (str &optional absolute-p)
-  "Given STR return expanded path.
+  "Return expanded path from STR if found or list of matches on multiple.
 The path referred to by STR has to exist for this to work.
 If ABSOLUTE-P is t the returned path will be absolute."
-  (->> (s-split "/" str)
-       (s-join "*/")
-       (s-replace "~*" "~")
-       f-glob
-       car
-       abbreviate-file-name))
+  (let* ((str-split (s-split "/" str 'omit-nulls))
+         (head (car str-split)))
+    (if (= (length str-split) 1)
+        (s-concat "/" str-split)
+      (-as-> (-drop 1 str-split) it
+             (s-join "*/" it)
+             (s-concat (if (s-equals? head "~") "~/" head) it)
+             (f-glob it)
+             (if absolute-p (-map #'f-full it) (-map #'f-abbrev it))
+             (if (= (length it) 1) (car it) it)))))
 
 ;;;###autoload
 (defun shrink-path-prompt (&optional pwd)
