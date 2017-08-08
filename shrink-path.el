@@ -38,7 +38,7 @@
   "Return STR's first character or first two characters if hidden."
   (substring str 0 (if (s-starts-with? "." str) 2 1)))
 
-(defun shrink-path--internal (full-path &optional truncate-all)
+(defun shrink-path--dirs-internal (full-path &optional truncate-all)
   "Return fish-style truncated string based on FULL-PATH.
 Optional parameter TRUNCATE-ALL will cause the function to truncate the last
 directory too."
@@ -60,16 +60,15 @@ directory too."
 
 
 ;;;###autoload
-(defun shrink-path (&optional path truncate-all)
+(defun shrink-path-dirs (&optional path truncate-tail)
   "Given PATH return fish-styled shrunken down path.
-Optional parameter TRUNCATE-ALL will cause the function to truncate the last
-directory too."
+TRUNCATE-TAIL will cause the function to truncate the last directory too."
   (let* ((path (or path default-directory))
          (path (f-full path)))
     (cond
      ((s-equals? (f-short path) "/") "/")
      ((s-matches? (rx bos (or "~" "/") eos) "~/"))
-     (t (shrink-path--internal path truncate-all)))))
+     (t (shrink-path--dirs-internal path truncate-tail)))))
 
 ;;;###autoload
 (defun shrink-path-expand (str &optional absolute-p)
@@ -89,9 +88,10 @@ If ABSOLUTE-P is t the returned path will be absolute."
 
 ;;;###autoload
 (defun shrink-path-prompt (&optional pwd)
-  "Return cons of BASE and DIR for PWD."
+  "Return cons of BASE and DIR for PWD.
+If PWD isn't provided will default to `default-directory'."
   (let* ((pwd (or pwd default-directory))
-         (shrunk (shrink-path pwd))
+         (shrunk (shrink-path-dirs pwd))
          (split (-as-> shrunk it (s-split "/" it 'omit-nulls)))
          base dir)
     (setq dir (or (-last-item split) "/"))
@@ -105,7 +105,7 @@ If ABSOLUTE-P is t the returned path will be absolute."
 TRUNCATE-TAIL controls if the last directory should also be shortened."
   (let ((filename (f-filename file))
         (dirname (f-dirname file)))
-    (s-concat (shrink-path dirname truncate-all-dirs) filename)))
+    (s-concat (shrink-path-dirs dirname truncate-tail) filename)))
 
 ;;;###autoload
 (defun shrink-path-file-expand (str &optional exists-p absolute-p)
