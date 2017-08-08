@@ -158,15 +158,15 @@
                   :to-equal
                   "~/.c/mpv/"))))))
 
-(describe "shrink-path-reverse"
+(describe "shrink-path-expand"
   (describe "multiple choice"
     (it "every"
-      (expect (shrink-path-reverse "~/P/d/z/.zplugin")
+      (expect (shrink-path-expand "~/P/d/z/.zplugin")
               :to-equal
               "~/Projects/dotfiles/zsh/.zplugin")))
   (describe "single choice"
     (it "tail only"
-      (expect (shrink-path-reverse "~/.c/mpv")
+      (expect (shrink-path-expand "~/.c/mpv")
               :to-equal
               "~/.config/mpv"))))
 
