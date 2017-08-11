@@ -7,3 +7,7 @@ eshell and for example modeline.
 #+html: <p align="center">
 #+html: <img src="//gitlab.com/bennya/shrink-path.el/raw/screenshots/eshell-prompt.png" />
 #+html: </p>
+
+#+html: <p align="center">
+#+html: <img src="//gitlab.com/bennya/shrink-path.el/raw/screenshots/doom-modeline.png" />
+#+html: </p>
