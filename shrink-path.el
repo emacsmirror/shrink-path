@@ -121,8 +121,13 @@ If ABSOLUTE-P is t the returned path will be absolute."
         (if (f-exists? expanded) expanded)
       expanded)))
 
+;;;###autoload
 (defun shrink-path-file-mixed (shrink-path rel-path filename)
-  "Returns list of truncated SHRINK-PATH's parent, relative SHRINK-PATH, relative REL-PATH and FILENAME."
+  "Returns list of mixed truncated file name locations.
+
+Consists of SHRINK-PATH's parent, SHRINK-PATH basename, relative REL-PATH and
+FILENAME.
+For use in modeline or prompts, etc."
   (let ((shrunk-dirs (shrink-path-prompt shrink-path))
         sp-parent sp-rel rel-rel nd-file)
 
