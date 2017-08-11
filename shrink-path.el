@@ -83,11 +83,12 @@ directory too."
     (cons base dir)))
 
 ;;;###autoload
-(defun shrink-path-file (file)
-  "Return FILE's shrunk down path and filename."
+(defun shrink-path-file (file &optional truncate-all-dirs)
+  "Return FILE's shrunk down path and filename.
+TRUNCATE-ALL-DIRS controls if the tail directory should also be shrunk."
   (let ((filename (f-filename file))
         (dirname (f-dirname file)))
-    (s-concat (shrink-path dirname) filename)))
+    (s-concat (shrink-path dirname truncate-all-dirs) filename)))
 
 (provide 'shrink-path)
 ;;; shrink-path.el ends here
