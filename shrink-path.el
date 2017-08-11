@@ -108,13 +108,15 @@ TRUNCATE-ALL-DIRS controls if the tail directory should also be shrunk."
     (s-concat (shrink-path dirname truncate-all-dirs) filename)))
 
 ;;;###autoload
-(defun shrink-path-file-reverse (str &optional exist-p absolute-p)
+(defun shrink-path-file-reverse (str &optional exists-p absolute-p)
   "Return STR's expanded filename.
 The path referred to by STR has to exist for this to work.
-If EXIST-P is t the filename also has to exist.
+If EXISTS-P is t the filename also has to exist.
 If ABSOLUTE-P is t the returned path will be absolute."
-  ;; TODO
-  )
+  (let ((reversed (shrink-path-reverse str absolute-p)))
+    (if exists-p
+        (if (f-exists? reversed) reversed)
+      reversed)))
 
 (provide 'shrink-path)
 ;;; shrink-path.el ends here
