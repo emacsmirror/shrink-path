@@ -29,8 +29,6 @@
 ;;; No commentary
 
 ;;; Code:
-(load "test/test-helper.el")
-
 (require 'shrink-path)
 
 (describe "shrink-path-dirs"
