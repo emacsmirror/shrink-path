@@ -118,5 +118,22 @@ If ABSOLUTE-P is t the returned path will be absolute."
         (if (f-exists? expanded) expanded)
       expanded)))
 
+(defun shrink-path-file-mixed (shrink-path rel-path filename)
+  "Returns list of truncated SHRINK-PATH's parent, relative SHRINK-PATH, relative REL-PATH and FILENAME."
+  (let ((shrunk-dirs (shrink-path-prompt shrink-path))
+        sp-parent sp-rel rel-rel nd-file)
+
+    (when (f-descendant-of? filename shrink-path)
+      (when shrunk-dirs
+        (setq sp-parent (car shrunk-dirs)
+              sp-rel (cdr shrunk-dirs)))
+      (setq rel-rel (if (or (f-same? rel-path shrink-path)
+                            (s-equals? (f-relative rel-path shrink-path) "."))
+                        nil
+                      (f-relative rel-path shrink-path)))
+      (setq nd-file (file-name-nondirectory filename))
+
+      (list sp-parent sp-rel rel-rel nd-file))))
+
 (provide 'shrink-path)
 ;;; shrink-path.el ends here

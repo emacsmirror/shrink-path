@@ -284,5 +284,65 @@
                   :to-equal
                   '("~/.c/" . "mpv")))))))
 
+(describe "shrink-path-file-mixed"
+  (describe "inside $HOME"
+    (describe "shrink-path: single dir deep"
+      (describe "relative path is"
+        (it "child of shrink-path"
+          (expect (shrink-path-file-mixed "/tmp"
+                                          "/tmp/emacs1000"
+                                          "/tmp/emacs1000/test.txt")
+                  :to-equal
+                  '("/" "tmp" "emacs1000" "test.txt")))
+        (it "same as shrink-path"
+          (expect (shrink-path-file-mixed "/tmp"
+                                          "/tmp"
+                                          "/tmp/volatile.log")
+                  :to-equal
+                  '("/" "tmp" nil "volatile.log")))))
+    (describe "shrink-path: more than one dirs deep"
+      (describe "relative path is"
+        (it "child of shrink-path"
+          (expect (shrink-path-file-mixed "~/Projects/Emacs-Lisp/shrink-path"
+                                          "~/Projects/Emacs-Lisp/shrink-path/test"
+                                          "~/Projects/Emacs-Lisp/shrink-path/test/shrink-path-test.el")
+                  :to-equal
+                  '("~/P/E/" "shrink-path" "test" "shrink-path-test.el")))
+        (it "same as shrink-path"
+          (expect (shrink-path-file-mixed "~/Projects/Emacs-Lisp/shrink-path"
+                                          "~/Projects/Emacs-Lisp/shrink-path"
+                                          "~/Projects/Emacs-Lisp/shrink-path/shrink-path.el")
+                  :to-equal
+                  '("~/P/E/" "shrink-path" nil "shrink-path.el"))))))
+  (describe "outside $HOME"
+    (describe "shrink-path: more than one dirs deep"
+      (describe "relative path is"
+        (it "same as shrink-path"
+          (expect (shrink-path-file-mixed "/etc/modprobe.d/"
+                                          "/etc/modprobe.d/"
+                                          "/etc/modprobe.d/thinkpad_acpi.conf")
+                  :to-equal '("/e/" "modprobe.d" nil "thinkpad_acpi.conf")))
+        (it "child of shrink-path"
+          (expect (shrink-path-file-mixed "/usr/share/emacs/"
+                                          "/usr/share/emacs/26.0.50/lisp"
+                                          "/usr/share/emacs/26.0.50/lisp/comint.el")
+                  :to-equal '("/u/s/" "emacs" "26.0.50/lisp" "comint.el"))))))
+  (describe "invalid input"
+    (it "filename not descendant of relative-path"
+      (expect (shrink-path-file-mixed "/tmp/"
+                                      "/tmp/emacs1000/"
+                                      "~/.emacs.d/init.el")
+              :to-be nil))
+    (it "relative-path not descendant of shrink-path"
+      (expect (shrink-path-file-mixed "/tmp/"
+                                      "~/.emacs.d/"
+                                      "~/.emacs.d/init.el")
+              :to-be nil))
+    (it "relative-path and filename both not descendant of shrink-path"
+      (expect (shrink-path-file-mixed "/tmp/"
+                                      "~/.emacs.d/"
+                                      "~/Projects/emacs-fun.el")
+              :to-be nil)) ))
+
 (provide 'shrink-path-test)
 ;;; shrink-path-test.el ends here
