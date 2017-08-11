@@ -79,12 +79,15 @@ If ABSOLUTE-P is t the returned path will be absolute."
          (head (car str-split)))
     (if (= (length str-split) 1)
         (s-concat "/" str-split)
-      (-as-> (-drop 1 str-split) it
-             (s-join "*/" it)
-             (s-concat (if (s-equals? head "~") "~/" head) it)
-             (f-glob it)
-             (if absolute-p (-map #'f-full it) (-map #'f-abbrev it))
-             (if (= (length it) 1) (car it) it)))))
+      (--> (-drop 1 str-split)   ;; drop head
+           (-map (lambda (e) (s-concat e "*")) it)
+           (-drop-last 1 it)     ;; drop tail as it may not exist
+           (s-join "/" it)
+           (s-concat (if (s-equals? head "~") "~/" head) it)
+           (f-glob it)
+           (-map (lambda (e) (s-concat e "/" (-last-item str-split))) it)
+           (if absolute-p (-map #'f-full it) (-map #'f-abbrev it))
+           (if (= (length it) 1) (car it) it)))))
 
 ;;;###autoload
 (defun shrink-path-prompt (&optional pwd)
@@ -92,7 +95,7 @@ If ABSOLUTE-P is t the returned path will be absolute."
 If PWD isn't provided will default to `default-directory'."
   (let* ((pwd (or pwd default-directory))
          (shrunk (shrink-path-dirs pwd))
-         (split (-as-> shrunk it (s-split "/" it 'omit-nulls)))
+         (split (--> shrunk (s-split "/" it 'omit-nulls)))
          base dir)
     (setq dir (or (-last-item split) "/"))
     (setq base (if (s-equals? dir "/") ""
@@ -114,7 +117,7 @@ The path referred to by STR has to exist for this to work.
 If EXISTS-P is t the filename also has to exist.
 If ABSOLUTE-P is t the returned path will be absolute."
   (let ((expanded (shrink-path-expand str absolute-p)))
-    (if exists-p
+    (if (and expanded exists-p)
         (if (f-exists? expanded) expanded)
       expanded)))
 
