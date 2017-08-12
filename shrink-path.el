@@ -4,9 +4,8 @@
 
 ;; Author: Benjamin Andresen
 ;; Version: 0.3.1
-;; Keywords: path
 ;; URL: https://gitlab.com/bennya/shrink-path.el
-;; Package-Requires: ((s "1.6.1") (dash "1.8.0") (f "0.10.0"))
+;; Package-Requires: ((emacs "24") (s "1.6.1") (dash "1.8.0") (f "0.10.0"))
 
 ;; This file is NOT part of GNU Emacs.
 
