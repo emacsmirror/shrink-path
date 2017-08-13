@@ -4,6 +4,7 @@
 Small utility functions that allow for fish-style trunctated directories in
 eshell and for example modeline.
 
+* Screenshots
 #+html: <p align="center">
 #+html: <img src="//gitlab.com/bennya/shrink-path.el/raw/screenshots/eshell-prompt.png" />
 #+html: </p>
@@ -11,3 +12,37 @@ eshell and for example modeline.
 #+html: <p align="center">
 #+html: <img src="//gitlab.com/bennya/shrink-path.el/raw/screenshots/doom-modeline.png" />
 #+html: </p>
+
+* Installation
+shrink-path will soon be available on [[https://melpa.org/#/shrink-path][MELPA]] (and [[https://stable.melpa.org/#/shrink-path][MELPA Stable]]).
+It can then be installed by using =M-x package-install RET shrink-path RET= inside Emacs.
+
+* Example configuration
+** eshell
+Configuration soon to be found in [[https://github.com/hlissner/.emacs.d][DOOM Emacs]].
+
+#+begin_src emacs-lisp :tangle yes
+(setq eshell-prompt-regexp "^.* λ "
+      eshell-prompt-function #'+eshell/prompt)
+
+(defun +eshell/prompt ()
+  (let ((base/dir (shrink-path-prompt default-directory)))
+        (concat (propertize (car base/dir)
+                            'face 'font-lock-comment-face)
+                (propertize (cdr base/dir)
+                            'face 'font-lock-constant-face)
+                (propertize (+eshell--current-git-branch)
+                            'face 'font-lock-function-name-face)
+                (propertize " λ" 'face 'eshell-prompt-face)
+                ;; needed for the input text to not have prompt face
+                (propertize " " 'face 'default))))
+
+;; for completeness sake
+(defun +eshell--current-git-branch ()
+    (let ((branch (car (loop for match in (split-string (shell-command-to-string "git branch") "\n")
+                             when (string-match "^\*" match)
+                             collect match))))
+      (if (not (eq branch nil))
+          (concat " [" (substring branch 2) "]")
+        "")))
+#+end_src
