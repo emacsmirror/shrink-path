@@ -1,21 +1,26 @@
 #+TITLE: shrink-path.el
 #+AUTHOR: Benjamin Andresen
 
+#+html: <a href="https://gitlab.com/bennya/shrink-path.el/pipelines"><img src="//gitlab.com/bennya/shrink-path.el/badges/master/build.svg" /></a>
+#+html: <a href="https://melpa.org/#/shrink-path"><img src="//melpa.org/packages/shrink-path-badge.svg" /></a>
+#+html: <a href="https://stable.melpa.org/#/shrink-path"><img src="//stable.melpa.org/packages/shrink-path-badge.svg" /></a>
+
 Small utility functions that allow for fish-style trunctated directories in
 eshell and for example modeline.
 
 * Screenshots
-#+html: <p align="center">
-#+html: <img src="//gitlab.com/bennya/shrink-path.el/raw/screenshots/eshell-prompt.png" />
-#+html: </p>
-
-#+html: <p align="center">
-#+html: <img src="//gitlab.com/bennya/shrink-path.el/raw/screenshots/doom-modeline.png" />
-#+html: </p>
+[[//gitlab.com/bennya/shrink-path.el/raw/screenshots/eshell-prompt.png]]
+[[//gitlab.com/bennya/shrink-path.el/raw/screenshots/doom-modeline.png]]
 
 * Installation
-shrink-path will soon be available on [[https://melpa.org/#/shrink-path][MELPA]] (and [[https://stable.melpa.org/#/shrink-path][MELPA Stable]]).
-It can then be installed by using =M-x package-install RET shrink-path RET= inside Emacs.
+shrink-path is available via [[https://melpa.org/#/shrink-path][MELPA]] (and [[https://stable.melpa.org/#/shrink-path][MELPA Stable]]).
+
+It can be installed by using =M-x package-install RET shrink-path RET= inside Emacs or even better using [[https://github.com/jwiegley/use-package][use-package]].
+#+begin_src emacs-lisp
+(use-package shrink-path
+  :ensure t
+  :demand t)
+#+end_src
 
 * Example configuration
 ** eshell
