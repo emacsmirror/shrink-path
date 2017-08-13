@@ -66,7 +66,6 @@ directory too."
               (unless (s-ends-with? "/" shrunk) "/"))))
 
 
-;;;###autoload
 (defun shrink-path-dirs (&optional path truncate-tail)
   "Given PATH return fish-styled shrunken down path.
 TRUNCATE-TAIL will cause the function to truncate the last directory too."
@@ -77,7 +76,6 @@ TRUNCATE-TAIL will cause the function to truncate the last directory too."
      ((s-matches? (rx bos (or "~" "/") eos) "~/"))
      (t (shrink-path--dirs-internal path truncate-tail)))))
 
-;;;###autoload
 (defun shrink-path-expand (str &optional absolute-p)
   "Return expanded path from STR if found or list of matches on multiple.
 The path referred to by STR has to exist for this to work.
@@ -96,7 +94,6 @@ If ABSOLUTE-P is t the returned path will be absolute."
            (if absolute-p (-map #'f-full it) (-map #'f-abbrev it))
            (if (= (length it) 1) (car it) it)))))
 
-;;;###autoload
 (defun shrink-path-prompt (&optional pwd)
   "Return cons of BASE and DIR for PWD.
 If PWD isn't provided will default to `default-directory'."
@@ -109,7 +106,6 @@ If PWD isn't provided will default to `default-directory'."
                  (s-chop-suffix (s-concat dir "/") shrunk)))
     (cons base dir)))
 
-;;;###autoload
 (defun shrink-path-file (file &optional truncate-tail)
   "Return FILE's shrunk down path and filename.
 TRUNCATE-TAIL controls if the last directory should also be shortened."
@@ -117,7 +113,6 @@ TRUNCATE-TAIL controls if the last directory should also be shortened."
         (dirname (f-dirname file)))
     (s-concat (shrink-path-dirs dirname truncate-tail) filename)))
 
-;;;###autoload
 (defun shrink-path-file-expand (str &optional exists-p absolute-p)
   "Return STR's expanded filename.
 The path referred to by STR has to exist for this to work.
@@ -128,7 +123,6 @@ If ABSOLUTE-P is t the returned path will be absolute."
         (if (f-exists? expanded) expanded)
       expanded)))
 
-;;;###autoload
 (defun shrink-path-file-mixed (shrink-path rel-path filename)
   "Returns list of mixed truncated file name locations.
 
